@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -29,11 +30,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         txtPageTitle = findViewById(R.id.txtPageTitle);
         txtContentTitle = findViewById(R.id.txtContentTitle);
         txtDescription = findViewById(R.id.txtDescription);
         recyclerEvents = findViewById(R.id.recyclerEvents);
         bottomNavigation = findViewById(R.id.bottomNavigation);
+
 
         recyclerEvents.setLayoutManager(new LinearLayoutManager(this));
         db = FirebaseFirestore.getInstance();
@@ -90,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
         eventList = new ArrayList<>();
 
         db.collection("events")
+                .whereEqualTo("status", "approved")
                 .get()
                 .addOnCompleteListener(task -> {
 
