@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "967006310570",
+    "project_id": "campusmate-d58d4",
+    "storage_bucket": "campusmate-d58d4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:967006310570:android:5e57b60b1bb6d2c12dc0d3",
+        "android_client_info": {
+          "package_name": "com.example.campusmate"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFk-wxrC_1vV43SUIZGpIVdg69Dx_qAjw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

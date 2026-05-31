@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F7FA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/detailToolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="#3F51B5"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:id="@+id/txtDetailTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Etkinlik Başlığı"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#222222" />
+
+            <TextView
+                android:id="@+id/txtDetailDate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tarih"
+                android:textSize="18sp"
+                android:textColor="#555555"
+                android:layout_marginTop="16dp" />
+
+            <TextView
+                android:id="@+id/txtDetailLocation"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Konum"
+                android:textSize="18sp"
+                android:textColor="#555555"
+                android:layout_marginTop="8dp" />
+
+            <TextView
+                android:id="@+id/txtDetailDescription"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Açıklama"
+                android:textSize="17sp"
+                android:textColor="#333333"
+                android:layout_marginTop="20dp" />
+
+            <Button
+                android:id="@+id/btnDetailFavorite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Favoriye Ekle"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#3F51B5"
+                android:textColor="#FFFFFF" />
+            <Button
+                android:id="@+id/btnNotify"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Hatırlat"
+                android:layout_marginTop="12dp"
+                android:backgroundTint="#FF9800"
+                android:textColor="#FFFFFF" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</ScrollView>
