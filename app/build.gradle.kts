@@ -36,6 +36,7 @@ dependencies {
     implementation("com.google.android.gms:play-services-maps:20.0.0")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
+    implementation("com.google.firebase:firebase-auth")
     implementation(libs.constraintlayout)
     implementation(libs.material)
     testImplementation(libs.junit)

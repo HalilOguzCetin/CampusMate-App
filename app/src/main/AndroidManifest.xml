@@ -26,13 +26,10 @@
         <activity android:name=".AdminEventsActivity"/>
 
         <activity android:name=".EventDetailActivity"/>
+        <activity android:name=".RegisterActivity"/>
 
         <activity
-            android:name=".MapActivity"
-            android:exported="false"/>
-
-        <activity
-            android:name=".MainActivity"
+            android:name=".LoginActivity"
             android:exported="true">
 
             <intent-filter>
@@ -42,6 +39,14 @@
             </intent-filter>
 
         </activity>
+
+        <activity
+            android:name=".MapActivity"
+            android:exported="false"/>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"/>
 
     </application>
 
