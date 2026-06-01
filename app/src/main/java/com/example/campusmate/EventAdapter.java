@@ -106,6 +106,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 Toast.makeText(context,
                         event.getTitle() + " favorilerden çıkarıldı",
                         Toast.LENGTH_SHORT).show();
+                NotificationHelper.showNotification(
+                        v.getContext(),
+                        "CampusMate",
+                        "Etkinlik favorilerden çıkarıldı."
+                );
 
             } else {
 
@@ -115,6 +120,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 Toast.makeText(context,
                         event.getTitle() + " favorilere eklendi ❤️",
                         Toast.LENGTH_SHORT).show();
+                NotificationHelper.showNotification(
+                        v.getContext(),
+                        "CampusMate",
+                        "Etkinlik favorilere eklendi."
+                );
             }
         });
     }

@@ -76,6 +76,13 @@ public class AdminUserAdapter extends RecyclerView.Adapter<AdminUserAdapter.User
                                 : "Admin kullanıcıya çevrildi";
 
                         Toast.makeText(v.getContext(), message, Toast.LENGTH_SHORT).show();
+                        NotificationHelper.showNotification(
+                                v.getContext(),
+                                "CampusMate Admin",
+                                newRole.equals("admin")
+                                        ? "Kullanıcı admin rolüne yükseltildi."
+                                        : "Admin rolü kullanıcıya çevrildi."
+                        );
                     })
                     .addOnFailureListener(e ->
                             Toast.makeText(v.getContext(), "İşlem başarısız: " + e.getMessage(), Toast.LENGTH_LONG).show()

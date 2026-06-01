@@ -48,14 +48,17 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         mMap = googleMap;
+
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.getUiSettings().setCompassEnabled(true);
         mMap.getUiSettings().setMapToolbarEnabled(true);
+
         LatLng campus = new LatLng(38.6826, 27.3139);
 
         mMap.addMarker(new MarkerOptions()
                 .position(campus)
-                .title("CBÜ Kampüs"));
+                .title("CBÜ Kampüs")
+                .snippet("Manisa Celal Bayar Üniversitesi"));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(campus, 15));
 
@@ -64,38 +67,91 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
     private void loadEventMarkers() {
         db.collection("events")
+                .whereEqualTo("status", "approved")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
                     int markerCount = 0;
+                    LatLng firstEventLocation = null;
 
                     for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
 
                         String title = document.getString("title");
-                        Double latitude = document.getDouble("latitude");
-                        Double longitude = document.getDouble("longitude");
+                        String date = document.getString("date");
+                        String category = document.getString("category");
+                        String location = document.getString("location");
+                        String description = document.getString("description");
 
-                        if (title != null && latitude != null && longitude != null) {
+                        if (title == null) title = "Başlıksız Etkinlik";
 
-                            LatLng eventLocation = new LatLng(latitude, longitude);
-
-                            mMap.addMarker(new MarkerOptions()
-                                    .position(eventLocation)
-                                    .title(title));
-
-                            markerCount++;
+                        if (category == null || category.isEmpty()) {
+                            category = AIEventAnalyzer.detectCategory(
+                                    title,
+                                    description != null ? description : ""
+                            );
                         }
+
+                        Double latitude = getDoubleValue(document, "latitude");
+                        Double longitude = getDoubleValue(document, "longitude");
+
+                        if (latitude == null || longitude == null) {
+                            continue;
+                        }
+
+                        LatLng eventLocation = new LatLng(latitude, longitude);
+
+                        if (firstEventLocation == null) {
+                            firstEventLocation = eventLocation;
+                        }
+
+                        mMap.addMarker(new MarkerOptions()
+                                .position(eventLocation)
+                                .title(title)
+                                .snippet(
+                                        "Kategori: " + category +
+                                                " | Tarih: " + (date != null ? date : "Tarih yok") +
+                                                " | Konum: " + (location != null ? location : "Konum yok")
+                                ));
+
+                        markerCount++;
+                    }
+
+                    if (firstEventLocation != null) {
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(firstEventLocation, 14));
                     }
 
                     Toast.makeText(this,
-                            markerCount + " etkinlik haritada gösterildi",
+                            markerCount + " onaylı etkinlik haritada gösterildi",
                             Toast.LENGTH_SHORT).show();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(this,
-                            "Etkinlikler haritaya yüklenemedi",
-                            Toast.LENGTH_SHORT).show();
+                            "Etkinlikler haritaya yüklenemedi: " + e.getMessage(),
+                            Toast.LENGTH_LONG).show();
                 });
+
+    }
+
+    private Double getDoubleValue(QueryDocumentSnapshot document, String fieldName) {
+        Object value = document.get(fieldName);
+
+        if (value instanceof Double) {
+            return (Double) value;
+        }
+
+        if (value instanceof Long) {
+            return ((Long) value).doubleValue();
+        }
+
+        if (value instanceof String) {
+            try {
+                return Double.parseDouble((String) value);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
     @Override
