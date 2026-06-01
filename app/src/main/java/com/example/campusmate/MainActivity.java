@@ -7,7 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
@@ -20,11 +20,12 @@ public class MainActivity extends AppCompatActivity {
     android.widget.TextView txtPageTitle, txtContentTitle, txtDescription;
     RecyclerView recyclerEvents;
     BottomNavigationView bottomNavigation;
-
+    android.widget.Button btnOpenAddEvent;
     List<Event> eventList;
     EventAdapter eventAdapter;
 
     FirebaseFirestore db;
+    FirebaseAuth auth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,9 +39,16 @@ public class MainActivity extends AppCompatActivity {
         recyclerEvents = findViewById(R.id.recyclerEvents);
         bottomNavigation = findViewById(R.id.bottomNavigation);
 
+        btnOpenAddEvent = findViewById(R.id.btnOpenAddEvent);
+
+        btnOpenAddEvent.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AddEventActivity.class);
+            startActivity(intent);
+        });
 
         recyclerEvents.setLayoutManager(new LinearLayoutManager(this));
         db = FirebaseFirestore.getInstance();
+        auth = FirebaseAuth.getInstance();
         showHomeScreen();
 
         bottomNavigation.setOnItemSelectedListener(item -> {
@@ -68,25 +76,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void showHomeScreen() {
+        btnOpenAddEvent.setVisibility(android.view.View.GONE);
         txtPageTitle.setText("CampusMate");
-        txtContentTitle.setText("Yaklaşan Etkinlikler");
-        txtDescription.setText("");
-
-        recyclerEvents.setVisibility(android.view.View.VISIBLE);
-
-        eventList = new ArrayList<>();
-        eventList.add(new Event("Yapay Zeka Semineri", "20 Mayıs 2026 - 14:00", "Mühendislik Fakültesi", "Yapay zeka ve makine öğrenmesi semineri"));
-        eventList.add(new Event("Bahar Şenliği", "25 Mayıs 2026 - 18:00", "Kampüs Açık Alanı", "Müzik ve öğrenci etkinlikleri"));
-        eventList.add(new Event("Kariyer Günleri", "28 Mayıs 2026 - 10:00", "Konferans Salonu", "Şirketlerle kariyer buluşması"));
-
-        eventAdapter = new EventAdapter(eventList);
-        recyclerEvents.setAdapter(eventAdapter);
-    }
-
-    private void showEventsScreen() {
-
-        txtPageTitle.setText("Etkinlikler");
-        txtContentTitle.setText("Firebase Etkinlikleri");
+        txtContentTitle.setText("Onaylanan Etkinlikler");
         txtDescription.setText("");
 
         recyclerEvents.setVisibility(android.view.View.VISIBLE);
@@ -107,15 +99,99 @@ public class MainActivity extends AppCompatActivity {
                             String location = document.getString("location");
                             String description = document.getString("description");
 
-                            eventList.add(new Event(title, date, location, description));
+                            String createdByName = document.getString("createdByName");
+
+                            if (createdByName == null) {
+                                createdByName = "Bilinmeyen Kullanıcı";
+                            }
+
+                            eventList.add(new Event(
+                                    title,
+                                    date,
+                                    location,
+                                    description,
+                                    createdByName
+                            ));
                         }
 
-                        eventAdapter = new EventAdapter(eventList);
-                        recyclerEvents.setAdapter(eventAdapter);
+                        if (eventList.isEmpty()) {
+                            recyclerEvents.setVisibility(android.view.View.GONE);
+                            txtDescription.setText("Henüz onaylanmış etkinlik bulunmuyor.");
+                        } else {
+                            eventAdapter = new EventAdapter(eventList);
+                            recyclerEvents.setAdapter(eventAdapter);
+                        }
                     }
                 });
     }
 
+    private void showEventsScreen() {
+        btnOpenAddEvent.setVisibility(android.view.View.VISIBLE);
+
+        txtPageTitle.setText("Etkinliklerim");
+        txtContentTitle.setText("Benim Eklediğim Etkinlikler");
+        txtDescription.setText("");
+
+        recyclerEvents.setVisibility(android.view.View.VISIBLE);
+
+        if (auth.getCurrentUser() == null) {
+            recyclerEvents.setVisibility(android.view.View.GONE);
+            txtDescription.setText("Kullanıcı oturumu bulunamadı.");
+            return;
+        }
+
+        String currentUserId = auth.getCurrentUser().getUid();
+
+        eventList = new ArrayList<>();
+
+        db.collection("events")
+                .whereEqualTo("createdBy", currentUserId)
+                .get()
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()) {
+
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+
+                            String title = document.getString("title");
+                            String date = document.getString("date");
+                            String location = document.getString("location");
+                            String description = document.getString("description");
+                            String status = document.getString("status");
+
+                            if (status == null) {
+                                status = "pending";
+                            }
+
+                            String statusText = status.equals("approved")
+                                    ? "Durum: Onaylandı"
+                                    : "Durum: Beklemede";
+
+                            String createdByName = document.getString("createdByName");
+
+                            if (createdByName == null) {
+                                createdByName = "Bilinmeyen Kullanıcı";
+                            }
+
+                            eventList.add(new Event(
+                                    title,
+                                    date,
+                                    location + "\n" + statusText,
+                                    description,
+                                    createdByName
+                            ));
+                        }
+
+                        if (eventList.isEmpty()) {
+                            recyclerEvents.setVisibility(android.view.View.GONE);
+                            txtDescription.setText("Henüz etkinlik eklemediniz.");
+                        } else {
+                            eventAdapter = new EventAdapter(eventList);
+                            recyclerEvents.setAdapter(eventAdapter);
+                        }
+                    }
+                });
+    }
     private void showMapScreen() {
 
         Intent intent = new Intent(MainActivity.this, MapActivity.class);
@@ -141,7 +217,8 @@ public class MainActivity extends AppCompatActivity {
                     title,
                     "Favori etkinlik",
                     "Yerel cihazda kayıtlı",
-                    "Bu etkinlik SharedPreferences ile favorilere kaydedildi."
+                    "Bu etkinlik SharedPreferences ile favorilere kaydedildi.",
+                    "CampusMate"
             ));
         }
 
@@ -158,7 +235,49 @@ public class MainActivity extends AppCompatActivity {
         txtPageTitle.setText("Profil");
         txtContentTitle.setText("Kullanıcı Profili");
 
+        btnOpenAddEvent.setVisibility(android.view.View.GONE);
         recyclerEvents.setVisibility(android.view.View.GONE);
-        txtDescription.setText("Ad Soyad: Öğrenci\nBölüm: Yazılım Mühendisliği\nUygulama: CampusMate");
+
+        if (auth.getCurrentUser() == null) {
+            txtDescription.setText("Kullanıcı oturumu bulunamadı.");
+            return;
+        }
+
+        String uid = auth.getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+
+                    if (documentSnapshot.exists()) {
+
+                        String name = documentSnapshot.getString("name");
+                        String email = documentSnapshot.getString("email");
+                        String department = documentSnapshot.getString("department");
+                        String classLevel = documentSnapshot.getString("classLevel");
+                        String role = documentSnapshot.getString("role");
+
+                        if (name == null) name = "Belirtilmedi";
+                        if (email == null) email = "Belirtilmedi";
+                        if (department == null) department = "Belirtilmedi";
+                        if (classLevel == null) classLevel = "Belirtilmedi";
+                        if (role == null) role = "user";
+
+                        txtDescription.setText(
+                                "👤 Ad Soyad: " + name +
+                                        "\n📧 E-posta: " + email +
+                                        "\n🏫 Bölüm: " + department +
+                                        "\n🎓 Sınıf: " + classLevel +
+                                        "\n🔐 Rol: " + role
+                        );
+
+                    } else {
+                        txtDescription.setText("Kullanıcı bilgisi bulunamadı.");
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    txtDescription.setText("Profil bilgileri alınamadı.");
+                });
     }
 }

@@ -37,7 +37,13 @@
             android:textColor="#333333"
             android:layout_marginBottom="10dp"/>
 
-
+        <Button
+            android:id="@+id/btnOpenAddEvent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Etkinlik Ekle"
+            android:layout_marginBottom="10dp"
+            android:visibility="gone"/>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerEvents"

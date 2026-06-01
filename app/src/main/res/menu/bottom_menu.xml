@@ -8,7 +8,7 @@
 
     <item
         android:id="@+id/nav_events"
-        android:title="Etkinlikler"
+        android:title="Etkinliklerim"
         android:icon="@android:drawable/ic_menu_agenda"/>
 
     <item

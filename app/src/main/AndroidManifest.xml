@@ -39,7 +39,8 @@
             </intent-filter>
 
         </activity>
-
+        <activity android:name=".AddEventActivity"/>
+        <activity android:name=".SelectLocationActivity"/>
         <activity
             android:name=".MapActivity"
             android:exported="false"/>
