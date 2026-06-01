@@ -1,11 +1,11 @@
 package com.example.campusmate;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -90,6 +90,14 @@ public class AddEventActivity extends AppCompatActivity {
                         userName = "Kullanıcı";
                     }
 
+                    AIEventAnalyzer.Prediction prediction =
+                            AIEventAnalyzer.analyze(title, description);
+
+                    String category = prediction.category;
+                    int aiScore = prediction.score;
+                    String aiResult = prediction.result;
+                    String aiReason = prediction.reason;
+
                     Map<String, Object> event = new HashMap<>();
 
                     event.put("title", title);
@@ -98,17 +106,32 @@ public class AddEventActivity extends AppCompatActivity {
                     event.put("description", description);
                     event.put("latitude", selectedLatitude);
                     event.put("longitude", selectedLongitude);
+
                     event.put("createdBy", userId);
                     event.put("createdByEmail", userEmail);
                     event.put("createdByName", userName);
+
                     event.put("status", "pending");
+
+                    event.put("category", category);
+                    event.put("aiScore", aiScore);
+                    event.put("aiResult", aiResult);
+                    event.put("aiReason", aiReason);
+                    event.put("mlLibrary", "Yerel ML/NLP sınıflandırma algoritması");
 
                     db.collection("events")
                             .add(event)
                             .addOnSuccessListener(documentReference -> {
+
                                 Toast.makeText(this,
                                         "Etkinlik gönderildi. Admin onayı bekleniyor.",
                                         Toast.LENGTH_LONG).show();
+
+                                NotificationHelper.showNotification(
+                                        AddEventActivity.this,
+                                        "CampusMate",
+                                        "Etkinliğin admin onayına gönderildi."
+                                );
 
                                 finish();
                             })
