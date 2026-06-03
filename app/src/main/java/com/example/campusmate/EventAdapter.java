@@ -44,9 +44,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
         Event event = eventList.get(position);
 
+        String createdByName = event.getCreatedByName();
+
+        if (createdByName == null || createdByName.trim().isEmpty()) {
+            createdByName = "CampusMate";
+        }
+
+        String firstLetter = createdByName.substring(0, 1).toUpperCase();
+
+        holder.txtAvatar.setText(firstLetter);
+        holder.txtCreatedByName.setText("Ekleyen: " + createdByName);
+
         holder.txtTitle.setText(event.getTitle());
         holder.txtDate.setText(event.getDate());
         holder.txtLocation.setText(event.getLocation());
+
         holder.itemView.setOnClickListener(v -> {
 
             android.content.Intent intent =
@@ -76,18 +88,29 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
             SharedPreferences.Editor editor = prefs.edit();
 
+            int adapterPosition = holder.getAdapterPosition();
+
+            if (adapterPosition == RecyclerView.NO_POSITION) {
+                return;
+            }
+
             if (isFavoritesScreen) {
 
                 editor.remove(event.getTitle());
                 editor.apply();
 
-                eventList.remove(position);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, eventList.size());
+                eventList.remove(adapterPosition);
+                notifyItemRemoved(adapterPosition);
+                notifyItemRangeChanged(adapterPosition, eventList.size());
 
                 Toast.makeText(context,
                         event.getTitle() + " favorilerden çıkarıldı",
                         Toast.LENGTH_SHORT).show();
+                NotificationHelper.showNotification(
+                        v.getContext(),
+                        "CampusMate",
+                        "Etkinlik favorilerden çıkarıldı."
+                );
 
             } else {
 
@@ -97,6 +120,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
                 Toast.makeText(context,
                         event.getTitle() + " favorilere eklendi ❤️",
                         Toast.LENGTH_SHORT).show();
+                NotificationHelper.showNotification(
+                        v.getContext(),
+                        "CampusMate",
+                        "Etkinlik favorilere eklendi."
+                );
             }
         });
     }
@@ -108,11 +136,15 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.EventViewHol
 
     public static class EventViewHolder extends RecyclerView.ViewHolder {
 
+        TextView txtAvatar, txtCreatedByName;
         TextView txtTitle, txtDate, txtLocation;
         Button btnFavorite;
 
         public EventViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            txtAvatar = itemView.findViewById(R.id.txtAvatar);
+            txtCreatedByName = itemView.findViewById(R.id.txtCreatedByName);
 
             txtTitle = itemView.findViewById(R.id.txtEventTitle);
             txtDate = itemView.findViewById(R.id.txtEventDate);

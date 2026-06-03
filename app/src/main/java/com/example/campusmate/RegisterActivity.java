@@ -17,7 +17,7 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText edtName, edtEmail, edtPassword;
+    EditText edtName, edtEmail, edtPassword, edtDepartment, edtClass;
     Button btnRegister;
 
     FirebaseAuth auth;
@@ -31,6 +31,8 @@ public class RegisterActivity extends AppCompatActivity {
         edtName = findViewById(R.id.edtName);
         edtEmail = findViewById(R.id.edtEmail);
         edtPassword = findViewById(R.id.edtPassword);
+        edtDepartment = findViewById(R.id.edtDepartment);
+        edtClass = findViewById(R.id.edtClass);
         btnRegister = findViewById(R.id.btnRegister);
 
         auth = FirebaseAuth.getInstance();
@@ -44,9 +46,19 @@ public class RegisterActivity extends AppCompatActivity {
         String name = edtName.getText().toString().trim();
         String email = edtEmail.getText().toString().trim();
         String password = edtPassword.getText().toString().trim();
+        String department = edtDepartment.getText().toString().trim();
+        String classLevel = edtClass.getText().toString().trim();
 
-        if (TextUtils.isEmpty(name) || TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-            Toast.makeText(this, "Tüm alanları doldurun", Toast.LENGTH_SHORT).show();
+        if (TextUtils.isEmpty(name) ||
+                TextUtils.isEmpty(email) ||
+                TextUtils.isEmpty(password) ||
+                TextUtils.isEmpty(department) ||
+                TextUtils.isEmpty(classLevel)) {
+
+            Toast.makeText(this,
+                    "Tüm alanları doldurun",
+                    Toast.LENGTH_SHORT).show();
+
             return;
         }
 
@@ -59,6 +71,8 @@ public class RegisterActivity extends AppCompatActivity {
                     user.put("name", name);
                     user.put("email", email);
                     user.put("role", "user");
+                    user.put("department", department);
+                    user.put("classLevel", classLevel);
 
                     db.collection("users")
                             .document(uid)

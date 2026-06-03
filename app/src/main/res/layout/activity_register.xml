@@ -34,6 +34,19 @@
         android:hint="Şifre"
         android:inputType="textPassword"
         android:layout_marginTop="12dp"/>
+    <EditText
+        android:id="@+id/edtDepartment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bölüm"
+        android:layout_marginTop="12dp"/>
+
+    <EditText
+        android:id="@+id/edtClass"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Sınıf"
+        android:layout_marginTop="12dp"/>
 
     <Button
         android:id="@+id/btnRegister"
@@ -41,5 +54,6 @@
         android:layout_height="wrap_content"
         android:text="Kayıt Ol"
         android:layout_marginTop="24dp"/>
+
 
 </LinearLayout>
